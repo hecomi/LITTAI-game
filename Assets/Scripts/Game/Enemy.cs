@@ -6,6 +6,20 @@ public class Enemy : MonoBehaviour
 	public bool isActivated = false;
 	public GameObject deadEffect;
 	public int hp = 100;
+	private int maxHp_;
+
+	public GameObject enemyStatusUi;
+	public Vector3 uiOffset = Vector3.forward * 0.1f;
+	private UiGauge hpGauge_;
+
+	void Start()
+	{
+		var ui = Instantiate(enemyStatusUi) as GameObject;
+		ui.transform.position = transform.position + uiOffset;
+		ui.transform.SetParent(transform);
+		maxHp_ = 100;
+		hpGauge_ = ui.GetComponentInChildren<UiGauge>();
+	}
 
 	void OnActivated()
 	{
@@ -15,6 +29,7 @@ public class Enemy : MonoBehaviour
 	void OnAttacked(int attack)
 	{
 		hp -= attack;
+		hpGauge_.val = 1f * hp / maxHp_;
 		if (hp <= 0) OnDead();
 	}
 
