@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
 		if (isDead) {
 			deadElapsedTime_ += Time.deltaTime;
 			if (deadElapsedTime_ >= deadWaitTime) {
-				OnRevival();
+				BroadcastMessage("OnRevival");
 			}
 		}
 
@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
 	{
 		if (isDead) return;
 		hp -= damage;
-		if (hp <= 0) OnDead();
+		if (hp <= 0) BroadcastMessage("OnDead", SendMessageOptions.DontRequireReceiver);
 
 		if (hitEffectPrefab) {
 			var effect = Instantiate(hitEffectPrefab) as GameObject;

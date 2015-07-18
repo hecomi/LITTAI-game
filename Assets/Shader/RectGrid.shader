@@ -48,8 +48,10 @@
             	half y2 = pow(1.0 - y0, p);
             	half4 grid = ((x1 + x2) + (y1 + y2)) / 2 * _Color;
             	
-            	half alpha = (0.5 + circle) * _Color.a;
-                return half4(half3(alpha * grid), alpha);
+            	// half alpha = (0.5 + circle) * _Color.a;
+                // return half4(half3(alpha * grid), alpha);
+            	half alpha = _Color.a;
+                return half4(half3(grid), alpha);
             }
 
             ENDCG

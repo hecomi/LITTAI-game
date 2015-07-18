@@ -24,5 +24,9 @@ public class PlayerUiMotion : MonoBehaviour
 		var offset = Vector3.down * 1f;
 		line.SetPosition(1, transform.position + offset);
 		line.SetPosition(0, parentPlayer.position + offset);
+
+		var from = transform.rotation;
+		var to = parentPlayer.rotation;
+		transform.rotation = Quaternion.Slerp(from, to, 0.1f);
 	}
 }

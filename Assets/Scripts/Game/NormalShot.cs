@@ -15,8 +15,12 @@ public class NormalShot : MonoBehaviour
 	public int maxPower = 300;
 	public int chargeRate = 10;
 
+	private bool isDead_ = false;
+
 	void Update()
 	{
+		if (isDead_) return;
+
 		if (Input.GetButtonDown("Fire1")) {
 			shotPower.refCount += 1;
 		}
@@ -43,5 +47,15 @@ public class NormalShot : MonoBehaviour
 			bullet.velocity = transform.forward * shotSpeed;
 		}
 		chargedPower = 0;
+	}
+
+	void OnDead()
+	{
+		isDead_ = true;
+	}
+
+	void OnRevival()
+	{
+		isDead_ = false;
 	}
 }
