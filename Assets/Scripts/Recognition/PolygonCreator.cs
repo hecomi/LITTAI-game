@@ -68,21 +68,20 @@ public class PolygonCreator : MonoBehaviour
 		indices.Add(vertexNum);
 		indices.Add(0);
 
-		var mesh = new Mesh();
-		mesh.name = "Custom Mesh";
-
-		mesh.vertices = vertices.ToArray();
-		mesh.triangles = indices.ToArray();
-
-		mesh.RecalculateNormals();
-		for (int i = 0; i < indexNum / 3; ++i) {
-			mesh.normals[i] = Vector3.up;
-		}
-		for (int i = indexNum / 3; i < indexNum * 2 / 3; ++i) {
-			mesh.normals[i] = Vector3.down;
+		foreach (var index in indices) {
+			if (index < 0 || index >= vertices.Count) return;
 		}
 
-		meshFilter_.sharedMesh = mesh;
+		try {
+			var mesh = new Mesh();
+			mesh.name = "Custom Mesh";
+			mesh.vertices = vertices.ToArray();
+			mesh.triangles = indices.ToArray();
+			mesh.RecalculateNormals();
+			meshFilter_.sharedMesh = mesh;
+		} catch (System.Exception e) {
+			Debug.LogError(e.Message);
+		}
 	}
 
 	[ContextMenu("Test")]
