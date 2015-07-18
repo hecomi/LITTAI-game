@@ -11,6 +11,8 @@ public class Player : MonoBehaviour
 	private float deadElapsedTime_ = 0f;
 
 	public GameObject hitEffectPrefab;
+	public PlayerStatusUI ui;
+	public ShotPower shotPower;
 
 	void Update()
 	{
@@ -20,6 +22,9 @@ public class Player : MonoBehaviour
 				OnRevival();
 			}
 		}
+
+		ui.hp = 1f * hp / maxHp;
+		ui.en = 1f * shotPower.power / shotPower.maxPower;
 	}
 
 	void OnAttacked(int damage)
