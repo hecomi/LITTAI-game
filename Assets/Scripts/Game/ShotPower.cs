@@ -22,6 +22,9 @@ public class ShotPower : MonoBehaviour
 
 	void Update()
 	{
+		if (refCount < 0) {
+			refCount = 0; // bad hack
+		}
 		if (refCount == 0 && power < maxPower) {
 			power += chargeSpeed;
 			if (power > maxPower) power = maxPower;

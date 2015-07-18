@@ -25,6 +25,7 @@ public class MarkerManager : MonoBehaviour
 	{
 		if (!markers_.ContainsKey(data.id)) {
 			var gameObj = Instantiate(markerPrefab) as GameObject; 
+			gameObj.transform.SetParent(GlobalObjects.localStage.transform);
 			var marker = gameObj.GetComponent<Marker>();
 			markers_.Add(data.id, marker);
 		}

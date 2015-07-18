@@ -40,6 +40,10 @@ public class Marker : MonoBehaviour
 	public void Update(MarkerData data)
 	{
 		data_ = data;
+		transform.localPosition = data.pos;
+		for (int i = 0; i < data.polygon.Count; ++i) {
+			data.polygon[i] -= data.pos;
+		}
 		polygon_.polygon = data.polygon;
 		polygon_.indices = data.indices;
 		UpdateEdge(data.edges);
@@ -62,16 +66,17 @@ public class Marker : MonoBehaviour
 				updatedMap[id] = true;
 			} else {
 				edgeObj = Instantiate(edgePrefab) as GameObject;
-				var shot = edgeObj.GetComponentInChildren<NormalShot>();
+				edgeObj.transform.SetParent(GlobalObjects.localStage.transform);
+				var shot = edgeObj.GetComponentInChildren<PlayerNormalShot>();
 				if (shot) {
 					shot.shotPower = GetComponent<ShotPower>();
 				}
 				edges_.Add(id, edgeObj);
 			}
-			edgeObj.transform.position = edge.pos; 
+			edgeObj.transform.localPosition = edge.pos; 
 			var dir = edge.dir.normalized;
 			dir.z *= -1;
-			edgeObj.transform.rotation = Quaternion.LookRotation(dir);
+			edgeObj.transform.localRotation = Quaternion.LookRotation(dir);
 		}
 
 		foreach (var data in updatedMap) {

@@ -25,6 +25,7 @@ public class LandoltManager : MonoBehaviour
 	{
 		if (!landolts_.ContainsKey(data.id)) {
 			var gameObj = Instantiate(landoltPrefab) as GameObject; 
+			gameObj.transform.SetParent(GlobalObjects.localStage.transform);
 			var landolt = gameObj.GetComponent<Landolt>();
 			landolts_.Add(data.id, landolt);
 		}

@@ -15,7 +15,7 @@ public class EdgeData
 public class MarkerData
 {
 	public int            id;
-	public Vector2        pos;
+	public Vector3        pos;
 	public float          angle;
 	public float          size;
 	public int            frameCount;

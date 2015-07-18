@@ -11,8 +11,30 @@ public class Player : MonoBehaviour
 	private float deadElapsedTime_ = 0f;
 
 	public GameObject hitEffectPrefab;
-	public PlayerStatusUI ui;
-	public ShotPower shotPower;
+	public GameObject uiPrefab;
+	private GameObject ui_;
+	private PlayerStatusUI status_;
+	private ShotPower shotPower_;
+
+	void Start()
+	{
+		ui_ = Instantiate(uiPrefab) as GameObject;
+		ui_.transform.SetParent(transform.parent);
+		ui_.transform.position = transform.position;
+		ui_.transform.rotation = transform.rotation;
+		var motion = ui_.GetComponent<PlayerUiMotion>();
+		if (motion) {
+			motion.target = transform;
+			status_ = motion.GetComponentInChildren<PlayerStatusUI>();
+		}
+
+		shotPower_ = GetComponent<ShotPower>();
+	}
+
+	void OnDestroy()
+	{
+		Destroy(ui_);
+	}
 
 	void Update()
 	{
@@ -23,8 +45,9 @@ public class Player : MonoBehaviour
 			}
 		}
 
-		ui.hp = 1f * hp / maxHp;
-		ui.en = 1f * shotPower.power / shotPower.maxPower;
+		status_.hp = 1f * hp / maxHp;
+		status_.en = 1f * shotPower_.power / shotPower_.maxPower;
+		status_.dead = isDead;
 	}
 
 	void OnAttacked(int damage)

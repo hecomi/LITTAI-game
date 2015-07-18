@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerUiMotion : MonoBehaviour
 {
-	public Transform parentPlayer;
+	public Transform target;
 	public float distance = 0.1f;
 	public float damping = 0.1f;
 
@@ -17,16 +17,16 @@ public class PlayerUiMotion : MonoBehaviour
 
 	void LateUpdate()
 	{
-		var dir = (parentPlayer.position - transform.position).normalized;
-		var targetPos = parentPlayer.position - dir * distance;
+		var dir = (target.position - transform.position).normalized;
+		var targetPos = target.position - dir * distance;
 		transform.position += (targetPos - transform.position) * damping;
 
 		var offset = Vector3.down * 1f;
 		line.SetPosition(1, transform.position + offset);
-		line.SetPosition(0, parentPlayer.position + offset);
+		line.SetPosition(0, target.position + offset);
 
 		var from = transform.rotation;
-		var to = parentPlayer.rotation;
+		var to = target.rotation;
 		transform.rotation = Quaternion.Slerp(from, to, 0.1f);
 	}
 }

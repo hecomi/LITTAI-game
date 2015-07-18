@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NormalShot : MonoBehaviour
+public class PlayerNormalShot : MonoBehaviour
 {
 	public ShotPower shotPower;
 	public GameObject shotPrefab;
@@ -16,12 +16,14 @@ public class NormalShot : MonoBehaviour
 	public int chargeRate = 10;
 
 	private bool isDead_ = false;
+	private bool isCharging_ = false;
 
 	void Update()
 	{
 		if (isDead_) return;
 
 		if (Input.GetButtonDown("Fire1")) {
+			isCharging_ = true;
 			shotPower.refCount += 1;
 		}
 		if (Input.GetButton("Fire1")) {
@@ -30,9 +32,15 @@ public class NormalShot : MonoBehaviour
 			}
 		}
 		if (Input.GetButtonUp("Fire1")) {
+			isCharging_ = false;
 			shotPower.refCount -= 1;
 			Shot();
 		}
+	}
+
+	void OnDestroy()
+	{
+		if (isCharging_) shotPower.refCount -= 1;
 	}
 
 	void Shot()
