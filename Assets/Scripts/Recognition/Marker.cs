@@ -67,8 +67,8 @@ public class Marker : MonoBehaviour
 			} else {
 				edgeObj = Instantiate(edgePrefab) as GameObject;
 				edgeObj.transform.SetParent(GlobalObjects.localStage.transform);
-				var shot = edgeObj.GetComponentInChildren<PlayerNormalShot>();
-				if (shot) {
+				var shots = edgeObj.GetComponentsInChildren<PlayerNormalShot>();
+				foreach (var shot in shots) {
 					shot.shotPower = GetComponent<ShotPower>();
 				}
 				edges_.Add(id, edgeObj);
