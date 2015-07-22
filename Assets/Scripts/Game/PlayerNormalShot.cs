@@ -3,6 +3,9 @@ using System.Collections;
 
 public class PlayerNormalShot : MonoBehaviour
 {
+	public bool isEmulation = false;
+	public int hwId = 0;
+
 	public ShotPower shotPower;
 	public GameObject shotPrefab;
 	public float minAttack = 10;
@@ -18,29 +21,48 @@ public class PlayerNormalShot : MonoBehaviour
 	private bool isDead_ = false;
 	private bool isCharging_ = false;
 
-	void Update()
+	void Start()
 	{
-		if (isDead_) return;
+		SerialHandler.Pressed  += OnChargeStart;
+		SerialHandler.Pressing += OnCharging;
+		SerialHandler.Released += OnShot;
+	}
 
-		if (Input.GetButtonDown("Fire1")) {
-			isCharging_ = true;
-			shotPower.refCount += 1;
+	bool IsOwnEvent(int id)
+	{
+		// return id == hwId;
+		return true;
+	}
+
+	void OnChargeStart(int id)
+	{
+		if (!IsOwnEvent(id) || isDead_ || isCharging_) return;
+		isCharging_ = true;
+		shotPower.refCount += 1;
+	}
+
+	void OnCharging(int id)
+	{
+		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
+		if (chargedPower < maxPower && shotPower.Use(chargeRate)) {
+			chargedPower += chargeRate;
 		}
-		if (Input.GetButton("Fire1")) {
-			if (chargedPower < maxPower && shotPower.Use(chargeRate)) {
-				chargedPower += chargeRate;
-			}
-		}
-		if (Input.GetButtonUp("Fire1")) {
-			isCharging_ = false;
-			shotPower.refCount -= 1;
-			Shot();
-		}
+	}
+
+	void OnShot(int id)
+	{
+		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
+		isCharging_ = false;
+		shotPower.refCount -= 1;
+		Shot();
 	}
 
 	void OnDestroy()
 	{
 		if (isCharging_) shotPower.refCount -= 1;
+		SerialHandler.Pressed  -= OnChargeStart;
+		SerialHandler.Pressing -= OnCharging;
+		SerialHandler.Released -= OnShot;
 	}
 
 	void Shot()

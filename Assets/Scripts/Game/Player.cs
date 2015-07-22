@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
 	{
 		ui_ = Instantiate(uiPrefab) as GameObject;
 		ui_.transform.SetParent(transform.parent);
-		ui_.transform.position = transform.position;
+		ui_.transform.position = transform.position + Vector3.right * 0.2f;
 		ui_.transform.rotation = transform.rotation;
 		var motion = ui_.GetComponent<PlayerUiMotion>();
 		if (motion) {

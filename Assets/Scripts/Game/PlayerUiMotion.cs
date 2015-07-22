@@ -17,8 +17,8 @@ public class PlayerUiMotion : MonoBehaviour
 
 	void LateUpdate()
 	{
-		var dir = (target.position - transform.position).normalized;
-		var targetPos = target.position - dir * distance;
+		var dir = (transform.position - target.position).normalized;
+		var targetPos = target.position + dir * distance;
 		transform.position += (targetPos - transform.position) * damping;
 
 		var offset = Vector3.down * 1f;
