@@ -8,6 +8,10 @@ public class Marker : MonoBehaviour
 {
 	private PolygonCreator polygon_;
 	private MarkerData data_;
+	public MarkerData data
+	{
+		get { return data_; }
+	}
 	private int lostCount_ = 0;
 
 	public GameObject edgePrefab;
@@ -39,11 +43,12 @@ public class Marker : MonoBehaviour
 
 	public void Update(MarkerData data)
 	{
+		if (float.IsNaN(data.pos.x) || float.IsNaN(data.pos.y) || float.IsNaN (data.pos.z)) return;
+		if (float.IsInfinity(data.pos.x) || float.IsInfinity(data.pos.y) || float.IsInfinity (data.pos.z)) return;
+
 		data_ = data;
 		transform.localPosition = data.pos;
-		for (int i = 0; i < data.polygon.Count; ++i) {
-			data.polygon[i] -= data.pos;
-		}
+		transform.localRotation = Quaternion.AngleAxis(data.angle * Mathf.Rad2Deg, Vector3.down);
 		polygon_.polygon = data.polygon;
 		polygon_.indices = data.indices;
 		UpdateEdge(data.edges);
@@ -66,7 +71,7 @@ public class Marker : MonoBehaviour
 				updatedMap[id] = true;
 			} else {
 				edgeObj = Instantiate(edgePrefab) as GameObject;
-				edgeObj.transform.SetParent(GlobalObjects.localStage.transform);
+				edgeObj.transform.SetParent(transform);
 				var shots = edgeObj.GetComponentsInChildren<PlayerNormalShot>();
 				foreach (var shot in shots) {
 					shot.shotPower = GetComponent<ShotPower>();

@@ -21,6 +21,8 @@ public class PlayerNormalShot : MonoBehaviour
 	private bool isDead_ = false;
 	private bool isCharging_ = false;
 
+	private int chargeCount = 0;
+
 	void Start()
 	{
 		SerialHandler.Pressed  += OnChargeStart;
@@ -37,6 +39,7 @@ public class PlayerNormalShot : MonoBehaviour
 	void OnChargeStart(int id)
 	{
 		if (!IsOwnEvent(id) || isDead_ || isCharging_) return;
+		Shot();
 		isCharging_ = true;
 		shotPower.refCount += 1;
 	}
@@ -44,6 +47,9 @@ public class PlayerNormalShot : MonoBehaviour
 	void OnCharging(int id)
 	{
 		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
+		++chargeCount;
+		if (chargeCount % 5 == 0) Shot();
+		return;
 		if (chargedPower < maxPower && shotPower.Use(chargeRate)) {
 			chargedPower += chargeRate;
 		}
@@ -54,7 +60,8 @@ public class PlayerNormalShot : MonoBehaviour
 		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
 		isCharging_ = false;
 		shotPower.refCount -= 1;
-		Shot();
+		//Shot();
+		chargeCount = 0;
 	}
 
 	void OnDestroy()

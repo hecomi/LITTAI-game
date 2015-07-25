@@ -69,8 +69,8 @@ public class SerialHandler : MonoBehaviour
 				string msg = tmpQueue.Dequeue();
 				int id = System.Convert.ToInt16(msg.Substring(1, 2), 16);
 				int value = System.Convert.ToInt16(msg.Substring(33, 2), 16);
-//				int target_di = System.Convert.ToInt16(msg.Substring(35, 2), 16);
-				Debug.Log (id+ " : " + value);
+				//int target_di = System.Convert.ToInt16(msg.Substring(35, 2), 16);
+				//Debug.Log (id+ " : " + value);
 				if(value == PushDown) {
 					if(id == SwitchId) {
 						if(isSwitchOn == false) {

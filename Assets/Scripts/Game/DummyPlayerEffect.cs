@@ -8,7 +8,6 @@ public class DummyPlayerEffect : MonoBehaviour
 	public GameObject revivalEffectPrefab;
 	public float blinkTime = 0.5f;
 	private Coroutine blinkCroutine_;
-	public RippleEffect ripple;
 
 	IEnumerator Blink()
 	{
