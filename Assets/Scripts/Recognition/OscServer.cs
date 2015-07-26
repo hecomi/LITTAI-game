@@ -97,13 +97,15 @@ public class OscServer : MonoBehaviour
 	{
 		LandoltData data = new LandoltData();
 
-		data.id      = json["id"].AsInt;
-		data.pos     = new Vector2(sign * json["x"].AsFloat, sign * json["y"].AsFloat);
-		data.radius  = json["radius"].AsFloat;
-		data.width   = json["width"].AsFloat;
-		data.height  = json["height"].AsFloat;
-		data.angle   = json["angle"].AsFloat + offsetAngle;
-		data.cnt     = 0;
+		data.id       = json["id"].AsInt;
+		data.pos      = new Vector2(sign * json["x"].AsFloat, sign * json["y"].AsFloat);
+		data.radius   = json["radius"].AsFloat;
+		data.width    = json["width"].AsFloat;
+		data.height   = json["height"].AsFloat;
+		data.angle    = json["angle"].AsFloat + offsetAngle;
+		data.cnt      = 0;
+		data.touched  = json["touched"].AsBool;
+		data.touchPos = new Vector2(json["touchX"].AsFloat, json["touchY"].AsFloat);
 
 		return data;
 	}
