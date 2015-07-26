@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayrShotHighlighter : MonoBehaviour
+public class PlayrColor : MonoBehaviour
 {
 	private Renderer renderer_;
 	private TrailRenderer trail_;
@@ -24,6 +24,24 @@ public class PlayrShotHighlighter : MonoBehaviour
 	{
 		SerialHandler.Pressed  -= OnPressed;
 		SerialHandler.Released -= OnReleased;
+	}
+
+	void OnDead()
+	{
+		if (trail_) {
+			var color = trail_.material.color;
+			color.a = originalColor_.a * 0.1f;
+			trail_.material.color = color;
+		}
+	}
+
+	void OnRevival()
+	{
+		if (trail_) {
+			var color = trail_.material.color;
+			color.a = originalColor_.a;
+			trail_.material.color = color;
+		}
 	}
 
 	void OnPressed(int id)

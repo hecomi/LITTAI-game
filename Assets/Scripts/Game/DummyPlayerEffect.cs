@@ -58,6 +58,14 @@ public class DummyPlayerEffect : MonoBehaviour
 		}
 	}
 
+	void SetColor(Color color)
+	{
+		foreach (var part in parts) {
+			var renderer = part.GetComponent<Renderer>();
+			renderer.material.color = color;
+		}
+	}
+
 	void SetColliderActive(bool isActive)
 	{
 		foreach (var part in parts) {

@@ -8,6 +8,10 @@ using System.Collections.Generic;
 public class OscServer : MonoBehaviour
 {
     public int listenPort = 6666;
+	public bool isReversed = true;
+	private int sign { get { return isReversed ? -1 : 1; } }
+	private float offsetAngle { get { return isReversed ? Mathf.PI : 0; } }
+
     private UdpClient udpClient_;
     private IPEndPoint endPoint_;
     private Osc.Parser osc_ = new Osc.Parser();
@@ -45,36 +49,46 @@ public class OscServer : MonoBehaviour
 
 	void ProcessMarkerMessage(Osc.Message msg)
 	{
-		var json = JSON.Parse(msg.data[0].ToString());
-		var data = convertToMarkerData(json);
+		try {
+			var json = JSON.Parse(msg.data[0].ToString());
+			var data = convertToMarkerData(json);
 
-		int markerIndex = "/marker".Length;
-		if (msg.path.IndexOf("/create") == markerIndex) {
-			MarkerManager.Create(data);
-		} else if (msg.path.IndexOf("/update") == markerIndex) {
-			MarkerManager.Update(data);
-		} else if (msg.path.IndexOf("/remove") == markerIndex) {
-			MarkerManager.Remove(data);
-		} else {
-			Debug.LogWarning("unknown message: " + msg);
+			int markerIndex = "/marker".Length;
+			if (msg.path.IndexOf("/create") == markerIndex) {
+				MarkerManager.Create(data);
+			} else if (msg.path.IndexOf("/update") == markerIndex) {
+				MarkerManager.Update(data);
+			} else if (msg.path.IndexOf("/remove") == markerIndex) {
+				MarkerManager.Remove(data);
+			} else {
+				Debug.LogWarning("unknown message: " + msg);
+			}
+		} catch (Exception e) {
+			Debug.LogWarning(e.Message);
+			Debug.LogWarning(msg);
 		}
 	}
 
 
 	void ProcessLandoltMessage(Osc.Message msg)
 	{
-		var json = JSON.Parse(msg.data[0].ToString());
-		var data = convertToLandoltData(json);
+		try {
+			var json = JSON.Parse(msg.data[0].ToString());
+			var data = convertToLandoltData(json);
 
-		int landoltIndex = "/landolt".Length;
-		if (msg.path.IndexOf("/create") == landoltIndex) {
-			LandoltManager.Create(data);
-		} else if (msg.path.IndexOf("/update") == landoltIndex) {
-			LandoltManager.Update(data);
-		} else if (msg.path.IndexOf("/remove") == landoltIndex) {
-			LandoltManager.Remove(data);
-		} else {
-			Debug.LogWarning("unknown message: " + msg);
+			int landoltIndex = "/landolt".Length;
+			if (msg.path.IndexOf("/create") == landoltIndex) {
+				LandoltManager.Create(data);
+			} else if (msg.path.IndexOf("/update") == landoltIndex) {
+				LandoltManager.Update(data);
+			} else if (msg.path.IndexOf("/remove") == landoltIndex) {
+				LandoltManager.Remove(data);
+			} else {
+				Debug.LogWarning("unknown message: " + msg);
+			}
+		} catch (Exception e) {
+			Debug.LogWarning(e.Message);
+			Debug.LogWarning(msg);
 		}
 	}
 
@@ -84,11 +98,11 @@ public class OscServer : MonoBehaviour
 		LandoltData data = new LandoltData();
 
 		data.id      = json["id"].AsInt;
-		data.pos     = new Vector2(json["x"].AsFloat, json["y"].AsFloat);
+		data.pos     = new Vector2(sign * json["x"].AsFloat, sign * json["y"].AsFloat);
 		data.radius  = json["radius"].AsFloat;
 		data.width   = json["width"].AsFloat;
 		data.height  = json["height"].AsFloat;
-		data.angle   = json["angle"].AsFloat;
+		data.angle   = json["angle"].AsFloat + offsetAngle;
 		data.cnt     = 0;
 
 		return data;
@@ -106,14 +120,14 @@ public class OscServer : MonoBehaviour
 		List<EdgeData> edges = new List<EdgeData>();
 		List<int> indices = new List<int>();
 		foreach (JSONClass vert in polygonData) {
-			polygon.Add(new Vector3(vert["x"].AsFloat, 0, vert["y"].AsFloat));
+			polygon.Add(new Vector3(sign * vert["x"].AsFloat, 0, sign * vert["y"].AsFloat));
 		}
 		foreach (JSONClass edgeData in edgesData) {
 			var edge = new EdgeData();
 			var dir = edgeData["direction"].AsObject;
 			edge.id  = edgeData["id"].AsInt;
-			edge.pos = new Vector3(edgeData["x"].AsFloat, 0, edgeData["y"].AsFloat);
-			edge.dir = new Vector3(dir["x"].AsFloat, 0, dir["y"].AsFloat);
+			edge.pos = new Vector3(sign * edgeData["x"].AsFloat, 0, sign * edgeData["y"].AsFloat);
+			edge.dir = new Vector3(sign * dir["x"].AsFloat, 0, sign * dir["y"].AsFloat);
 			edges.Add(edge);
 		}
 		foreach (JSONData index in indicesData) {
@@ -121,7 +135,7 @@ public class OscServer : MonoBehaviour
 		}
 
 		data.id      = json["id"].AsInt;
-		data.pos     = new Vector3(json["x"].AsFloat, 0f, json["y"].AsFloat);
+		data.pos     = new Vector3(sign * json["x"].AsFloat, 0f, sign * json["y"].AsFloat);
 		data.size    = json["size"].AsFloat;
 		data.angle   = json["angle"].AsFloat;
 		data.polygon = polygon;

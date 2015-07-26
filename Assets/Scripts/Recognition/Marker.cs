@@ -17,10 +17,31 @@ public class Marker : MonoBehaviour
 	public GameObject edgePrefab;
 	private Dictionary<int, GameObject> edges_ = new Dictionary<int, GameObject>();
 
+	private Vector3 prePos_ = Vector3.zero;
+	private float currentAngle_ = 0f;
+	private float preAngle_ = 0f;
+	private Vector3 velocity_ = Vector3.zero;
+	private float angleVelocity_ = 0f;
+	private float lastTime_ = 0f;
+	private float lastInterpTime_ = 0f;
+	public int maxInterpDuration = 5;
+	private int updateCount_ = 0;
+	private int interpCount_ = 0;
+
+	private Vector3 rawPos_ = Vector3.zero;
+	public float filter = 0.5f;
+
+	private bool isInitialized_ = false;
 
 	void Awake()
 	{
 		polygon_ = GetComponent<PolygonCreator>();
+	}
+
+
+	void Start()
+	{
+		rawPos_ = transform.position;
 	}
 
 
@@ -35,9 +56,16 @@ public class Marker : MonoBehaviour
 	void Update()
 	{
 		++lostCount_;
-		if (lostCount_ > 180) {
+		if (lostCount_ > 120) {
 			MarkerManager.Remove(data_);
 		}
+
+		UpdateInterpolation();
+
+		transform.localPosition += (rawPos_ - transform.localPosition) * filter;
+		var from = transform.localRotation;
+		var to   = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
+		transform.localRotation = Quaternion.Slerp(from, to, filter);
 	}
 
 
@@ -47,12 +75,42 @@ public class Marker : MonoBehaviour
 		if (float.IsInfinity(data.pos.x) || float.IsInfinity(data.pos.y) || float.IsInfinity (data.pos.z)) return;
 
 		data_ = data;
-		transform.localPosition = data.pos;
-		transform.localRotation = Quaternion.AngleAxis(data.angle * Mathf.Rad2Deg, Vector3.down);
+		rawPos_ = data.pos;
 		polygon_.polygon = data.polygon;
 		polygon_.indices = data.indices;
 		UpdateEdge(data.edges);
 		lostCount_ = 0;
+
+		var dt = Time.time - lastTime_;
+		if (dt == 0) return;
+
+		velocity_ = (data.pos - prePos_) / dt;
+		angleVelocity_ = (data.angle - preAngle_) / dt;
+		currentAngle_ = preAngle_ = data.angle;
+		prePos_ = rawPos_;
+		lastTime_ = lastInterpTime_ = Time.time;
+		++updateCount_;
+		interpCount_ = 0;
+
+		if (!isInitialized_) {
+			transform.localPosition = rawPos_;
+			transform.localRotation = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
+			isInitialized_ = true;
+		}
+	}
+
+
+	void UpdateInterpolation()
+	{
+		if (updateCount_ <= 2 || interpCount_ > maxInterpDuration) return;
+		if (Time.time == lastInterpTime_) return;
+
+		var dt = Time.time - lastInterpTime_;
+		rawPos_ += velocity_ * dt;
+		currentAngle_ += angleVelocity_ * dt;
+
+		lastInterpTime_ = Time.time;
+		++interpCount_;
 	}
 
 

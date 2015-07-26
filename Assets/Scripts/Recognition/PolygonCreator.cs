@@ -7,6 +7,8 @@ using System.Linq;
 public class PolygonCreator : MonoBehaviour
 {
 	public float height = 1f;
+	public int updateInterval = 30;
+	private int frameCount = 0;
 
 	private List<Vector3> polygon_ = new List<Vector3>();
 	public List<Vector3> polygon 
@@ -30,6 +32,8 @@ public class PolygonCreator : MonoBehaviour
 
 	void Update()
 	{
+		if (frameCount++ % updateInterval != 0) return;
+
 		if (polygon_.Count == 0) return;
 
 		int vertexNum = polygon_.Count();

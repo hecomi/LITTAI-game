@@ -8,26 +8,22 @@ public class PlayerNormalShot : MonoBehaviour
 
 	public ShotPower shotPower;
 	public GameObject shotPrefab;
-	public float minAttack = 10;
-	public float maxAttack = 50;
-	public float minScale  = 1f;
-	public float maxScale  = 2f;
+	public int cost = 10;
+	public int attack = 10;
 	public float shotSpeed = 3f;
-
-	public int chargedPower = 0;
-	public int maxPower = 300;
-	public int chargeRate = 10;
+	public int rate = 5;
 
 	private bool isDead_ = false;
-	private bool isCharging_ = false;
-
-	private int chargeCount = 0;
+	private int frameCount_ = 0;
 
 	void Start()
 	{
-		SerialHandler.Pressed  += OnChargeStart;
-		SerialHandler.Pressing += OnCharging;
-		SerialHandler.Released += OnShot;
+		SerialHandler.Pressing += OnContinuousShot;
+	}
+
+	void OnDestroy()
+	{
+		SerialHandler.Pressing -= OnContinuousShot;
 	}
 
 	bool IsOwnEvent(int id)
@@ -36,54 +32,26 @@ public class PlayerNormalShot : MonoBehaviour
 		return true;
 	}
 
-	void OnChargeStart(int id)
+	void OnContinuousShot(int id)
 	{
-		if (!IsOwnEvent(id) || isDead_ || isCharging_) return;
-		Shot();
-		isCharging_ = true;
-		shotPower.refCount += 1;
-	}
-
-	void OnCharging(int id)
-	{
-		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
-		++chargeCount;
-		if (chargeCount % 5 == 0) Shot();
-		return;
-		if (chargedPower < maxPower && shotPower.Use(chargeRate)) {
-			chargedPower += chargeRate;
+		if (!IsOwnEvent(id) || isDead_) return;
+		if (frameCount_ % rate == 0) { 
+			Shot();
 		}
-	}
-
-	void OnShot(int id)
-	{
-		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
-		isCharging_ = false;
-		shotPower.refCount -= 1;
-		//Shot();
-		chargeCount = 0;
-	}
-
-	void OnDestroy()
-	{
-		if (isCharging_) shotPower.refCount -= 1;
-		SerialHandler.Pressed  -= OnChargeStart;
-		SerialHandler.Pressing -= OnCharging;
-		SerialHandler.Released -= OnShot;
+		++frameCount_;
 	}
 
 	void Shot()
 	{
-		var shot = Instantiate(shotPrefab, transform.position, transform.rotation) as GameObject;
-		shot.transform.parent = GlobalObjects.localStage.transform;
-		var ratio = 1f * chargedPower / maxPower;
-		shot.transform.localScale *= minScale * (1 - ratio) + maxScale * ratio; 
-		var bullet = shot.GetComponent<PlayerBullet>();
-		if (bullet) {
-			bullet.attack = (int)(minAttack * (1f - ratio) + maxAttack * ratio);
-			bullet.velocity = transform.forward * shotSpeed;
+		if (shotPower.Use(cost)) {
+			var shot = Instantiate(shotPrefab, transform.position, transform.rotation) as GameObject;
+			shot.transform.parent = GlobalObjects.localStage.transform;
+			var bullet = shot.GetComponent<PlayerBullet>();
+			if (bullet) {
+				bullet.attack = attack;
+				bullet.velocity = transform.forward * shotSpeed;
+			}
 		}
-		chargedPower = 0;
 	}
 
 	void OnDead()
