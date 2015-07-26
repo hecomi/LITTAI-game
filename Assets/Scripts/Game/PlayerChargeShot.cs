@@ -39,35 +39,31 @@ public class PlayerChargeShot : MonoBehaviour
 	void OnChargeStart(int id)
 	{
 		if (!IsOwnEvent(id) || isDead_ || isCharging_) return;
-		Shot();
 		isCharging_ = true;
-		shotPower.refCount += 1;
+		shotPower.Get(gameObject);
 	}
 
 	void OnCharging(int id)
 	{
 		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
 		++chargeCount;
-		if (chargeCount % 5 == 0) Shot();
-		/*
 		if (chargedPower < maxPower && shotPower.Use(chargeRate)) {
 			chargedPower += chargeRate;
 		}
-		*/
 	}
 
 	void OnShot(int id)
 	{
 		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
 		isCharging_ = false;
-		shotPower.refCount -= 1;
-		//Shot();
+		shotPower.Release(gameObject);
+		Shot();
 		chargeCount = 0;
 	}
 
 	void OnDestroy()
 	{
-		if (isCharging_) shotPower.refCount -= 1;
+		shotPower.Release(gameObject);
 		SerialHandler.Pressed  -= OnChargeStart;
 		SerialHandler.Pressing -= OnCharging;
 		SerialHandler.Released -= OnShot;

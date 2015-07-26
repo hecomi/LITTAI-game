@@ -18,12 +18,17 @@ public class PlayerNormalShot : MonoBehaviour
 
 	void Start()
 	{
+		SerialHandler.Pressed  += OnShotStart;
 		SerialHandler.Pressing += OnContinuousShot;
+		SerialHandler.Released += OnShotEnd;
 	}
 
 	void OnDestroy()
 	{
+		SerialHandler.Pressed  -= OnShotStart;
 		SerialHandler.Pressing -= OnContinuousShot;
+		SerialHandler.Released -= OnShotEnd;
+		shotPower.Release(gameObject);
 	}
 
 	bool IsOwnEvent(int id)
@@ -32,8 +37,24 @@ public class PlayerNormalShot : MonoBehaviour
 		return true;
 	}
 
+	void OnShotStart(int id)
+	{
+		// nothing to do
+	}
+
+	void OnShotEnd(int id)
+	{
+		if (IsOwnEvent(id)) {
+			shotPower.Release(gameObject);
+		}
+	}
+
 	void OnContinuousShot(int id)
 	{
+		if (IsOwnEvent(id)) {
+			shotPower.Get(gameObject);
+		}
+
 		if (!IsOwnEvent(id) || isDead_) return;
 		if (frameCount_ % rate == 0) { 
 			Shot();

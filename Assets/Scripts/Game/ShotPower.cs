@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ShotPower : MonoBehaviour
 {
 	public int power = 0;
 	public int maxPower = 1000;
 	public int chargeSpeed = 3;
-	public int refCount = 0;
+	private HashSet<GameObject> refs_ = new HashSet<GameObject>();
 
 	public bool Use(int point)
 	{
@@ -20,12 +21,19 @@ public class ShotPower : MonoBehaviour
 		return power >= point;
 	}
 
+	public void Get(GameObject user)
+	{
+		refs_.Add(user);
+	}
+
+	public void Release(GameObject user)
+	{
+		if (refs_.Contains(user)) refs_.Remove(user);
+	}
+
 	void Update()
 	{
-		if (refCount < 0) {
-			refCount = 0; // bad hack
-		}
-		if (refCount == 0 && power < maxPower) {
+		if (refs_.Count == 0 && power < maxPower) {
 			power += chargeSpeed;
 			if (power > maxPower) power = maxPower;
 		}

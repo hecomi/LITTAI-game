@@ -62,10 +62,16 @@ public class Marker : MonoBehaviour
 
 		UpdateInterpolation();
 
-		transform.localPosition += (rawPos_ - transform.localPosition) * filter;
-		var from = transform.localRotation;
-		var to   = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
-		transform.localRotation = Quaternion.Slerp(from, to, filter);
+		if (!isInitialized_) {
+			transform.localPosition = rawPos_;
+			transform.localRotation = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
+			isInitialized_ = true;
+		} else {
+			transform.localPosition += (rawPos_ - transform.localPosition) * filter;
+			var from = transform.localRotation;
+			var to   = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
+			transform.localRotation = Quaternion.Slerp(from, to, filter);
+		}
 	}
 
 
@@ -91,12 +97,6 @@ public class Marker : MonoBehaviour
 		lastTime_ = lastInterpTime_ = Time.time;
 		++updateCount_;
 		interpCount_ = 0;
-
-		if (!isInitialized_) {
-			transform.localPosition = rawPos_;
-			transform.localRotation = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
-			isInitialized_ = true;
-		}
 	}
 
 

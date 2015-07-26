@@ -16,24 +16,18 @@ public class Player : MonoBehaviour
 	private PlayerStatusUI status_;
 	private ShotPower shotPower_;
 
+	private int frameCount_ = 0;
+
 	void Start()
 	{
-		ui_ = Instantiate(uiPrefab) as GameObject;
-		ui_.transform.SetParent(transform.parent);
-		ui_.transform.position = transform.position + Vector3.right * 0.2f;
-		ui_.transform.rotation = transform.rotation;
-		var motion = ui_.GetComponent<PlayerUiMotion>();
-		if (motion) {
-			motion.target = transform;
-			status_ = motion.GetComponentInChildren<PlayerStatusUI>();
-		}
-
 		shotPower_ = GetComponent<ShotPower>();
 	}
 
 	void OnDestroy()
 	{
-		Destroy(ui_);
+		if (ui_) {
+			Destroy(ui_);
+		}
 	}
 
 	void Update()
@@ -45,9 +39,28 @@ public class Player : MonoBehaviour
 			}
 		}
 
-		status_.hp = 1f * hp / maxHp;
-		status_.en = 1f * shotPower_.power / shotPower_.maxPower;
-		status_.dead = isDead;
+		if (status_) {
+			status_.hp = 1f * hp / maxHp;
+			status_.en = 1f * shotPower_.power / shotPower_.maxPower;
+			status_.dead = isDead;
+		}
+
+		if (frameCount_ == 10) {
+			ui_ = Instantiate(uiPrefab) as GameObject;
+			ui_.transform.SetParent(transform.parent);
+			ui_.transform.position = transform.position + Vector3.right * 0.2f;
+			ui_.transform.rotation = transform.rotation;
+			ui_.transform.localScale = Vector3.zero;
+			var motion = ui_.GetComponent<PlayerUiMotion>();
+			if (motion) {
+				motion.target = transform;
+				status_ = motion.GetComponentInChildren<PlayerStatusUI>();
+			}
+		} else if (frameCount_ > 10 && frameCount_ < 60) {
+			ui_.transform.localScale += (Vector3.one - ui_.transform.localScale) * 0.1f;
+		}
+
+		++frameCount_;
 	}
 
 	void OnAttacked(int damage)
