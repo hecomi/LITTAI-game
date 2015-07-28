@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ShotPower : MonoBehaviour
+public class ShotCharge : MonoBehaviour
 {
 	public int power = 0;
 	public int maxPower = 1000;

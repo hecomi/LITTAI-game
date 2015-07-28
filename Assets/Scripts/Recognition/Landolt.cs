@@ -69,6 +69,7 @@ public class Landolt : MonoBehaviour
 			touched_ = data.touched;
 			if (touched_) {
 				SendMessage("OnTouchStart", data.touchPos, SendMessageOptions.DontRequireReceiver);
+				Sound.Play("LandoltTouch");
 			} else {
 				SendMessage("OnTouchEnd", data.touchPos, SendMessageOptions.DontRequireReceiver);
 			}
@@ -91,5 +92,16 @@ public class Landolt : MonoBehaviour
 
 		lastInterpTime_ = Time.time;
 		++interpCount_;
+	}
+
+
+	public void _SetLostCountZero()
+	{
+		lostCount_ = 0;
+	}
+
+	public void _SetRawPos(Vector3 pos)
+	{
+		rawPos_ = pos;
 	}
 }

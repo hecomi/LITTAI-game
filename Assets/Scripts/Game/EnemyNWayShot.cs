@@ -22,6 +22,7 @@ public class EnemyNWayShot : MonoBehaviour
 			var dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
 			ShotTo(dir);
 		}
+		Sound.Play("EnemyShot");
 	}
 
 	void Update()

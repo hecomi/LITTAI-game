@@ -1,12 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerChargeShot : MonoBehaviour
+public class PlayerChargeShot : PlayerShot
 {
-	public bool isEmulation = false;
-	public int hwId = 0;
-
-	public ShotPower shotPower;
 	public GameObject shotPrefab;
 	public float minAttack = 10;
 	public float maxAttack = 50;
@@ -17,57 +13,28 @@ public class PlayerChargeShot : MonoBehaviour
 	public int chargedPower = 0;
 	public int maxPower = 300;
 	public int chargeRate = 10;
-
-	private bool isDead_ = false;
-	private bool isCharging_ = false;
-
 	private int chargeCount = 0;
 
-	void Start()
+	protected override void OnPressed()
 	{
-		SerialHandler.Pressed  += OnChargeStart;
-		SerialHandler.Pressing += OnCharging;
-		SerialHandler.Released += OnShot;
 	}
 
-	bool IsOwnEvent(int id)
+	protected override void OnPressing()
 	{
-		// return id == hwId;
-		return true;
-	}
-
-	void OnChargeStart(int id)
-	{
-		if (!IsOwnEvent(id) || isDead_ || isCharging_) return;
-		isCharging_ = true;
-		shotPower.Get(gameObject);
-	}
-
-	void OnCharging(int id)
-	{
-		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
+		if (IsDead()) return;
 		++chargeCount;
-		if (chargedPower < maxPower && shotPower.Use(chargeRate)) {
+		if (chargedPower < maxPower && CanUse(chargeRate)) {
 			chargedPower += chargeRate;
 		}
 	}
 
-	void OnShot(int id)
+	protected override void OnReleased()
 	{
-		if (!IsOwnEvent(id) || isDead_ || !isCharging_) return;
-		isCharging_ = false;
-		shotPower.Release(gameObject);
+		if (IsDead()) return;
 		Shot();
 		chargeCount = 0;
 	}
 
-	void OnDestroy()
-	{
-		shotPower.Release(gameObject);
-		SerialHandler.Pressed  -= OnChargeStart;
-		SerialHandler.Pressing -= OnCharging;
-		SerialHandler.Released -= OnShot;
-	}
 
 	void Shot()
 	{
@@ -81,15 +48,5 @@ public class PlayerChargeShot : MonoBehaviour
 			bullet.velocity = transform.forward * shotSpeed;
 		}
 		chargedPower = 0;
-	}
-
-	void OnDead()
-	{
-		isDead_ = true;
-	}
-
-	void OnRevival()
-	{
-		isDead_ = false;
 	}
 }

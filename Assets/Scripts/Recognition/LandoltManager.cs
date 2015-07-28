@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class LandoltManager : MonoBehaviour
 {
@@ -21,6 +22,13 @@ public class LandoltManager : MonoBehaviour
 	}
 
 
+	public static Landolt GetFirst()
+	{
+		if (Instance.landolts_.Count == 0) return null;
+		return Instance.landolts_.First().Value;
+	}
+
+
 	private void CreateImpl(LandoltData data)
 	{
 		if (!landolts_.ContainsKey(data.id)) {
@@ -28,6 +36,7 @@ public class LandoltManager : MonoBehaviour
 			gameObj.transform.SetParent(GlobalObjects.localStage.transform);
 			var landolt = gameObj.GetComponent<Landolt>();
 			landolts_.Add(data.id, landolt);
+			Sound.Play("LandoltDetected");
 		}
 		Update(data);
 	}
@@ -68,5 +77,15 @@ public class LandoltManager : MonoBehaviour
 	static public void Remove(LandoltData data)
 	{
 		Instance.RemoveImpl(data);
+	}
+
+	private void AddDummyImpl(int id, Landolt landolt)
+	{
+		landolts_.Add(id, landolt);
+	}
+
+	static public void AddDummy(int id, Landolt landolt)
+	{
+		Instance.AddDummyImpl(id, landolt);
 	}
 }

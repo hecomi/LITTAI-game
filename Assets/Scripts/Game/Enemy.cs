@@ -6,9 +6,11 @@ public class Enemy : MonoBehaviour
 	public bool isActivated = false;
 	public GameObject deadEffect;
 	public int hp = 100;
+	public int score = 50;
 	private int maxHp_;
 
 	public GameObject enemyStatusUi;
+	public GameObject[] items;
 	public Vector3 uiOffset = Vector3.forward * 0.1f;
 	private UiGauge hpGauge_;
 
@@ -40,7 +42,14 @@ public class Enemy : MonoBehaviour
 			effect.transform.position = transform.position;
 			effect.transform.parent = transform.parent;
 		}
+		foreach (var item in items) {
+			var obj = Instantiate(item) as GameObject;
+			obj.transform.position = transform.position;
+			obj.transform.SetParent(transform.parent);
+		}
 		Destroy(gameObject);
+		Score.Add(score);
+		Sound.Play("EnemyDeath");
 	}
 
 	void Update()

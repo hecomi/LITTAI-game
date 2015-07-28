@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
 
-[RequireComponent(typeof(PolygonCreator))]
+[RequireComponent(typeof(PolygonCreator)), RequireComponent(typeof(ShotCharge))]
 public class Marker : MonoBehaviour
 {
 	private PolygonCreator polygon_;
@@ -32,6 +32,7 @@ public class Marker : MonoBehaviour
 	public float filter = 0.5f;
 
 	private bool isInitialized_ = false;
+	private ShotCharge charge_;
 
 	void Awake()
 	{
@@ -42,6 +43,7 @@ public class Marker : MonoBehaviour
 	void Start()
 	{
 		rawPos_ = transform.position;
+		charge_ = GetComponent<ShotCharge>();
 	}
 
 
@@ -84,7 +86,7 @@ public class Marker : MonoBehaviour
 		rawPos_ = data.pos;
 		polygon_.polygon = data.polygon;
 		polygon_.indices = data.indices;
-		UpdateEdge(data.edges);
+		UpdateEdge(data.id, data.edges);
 		lostCount_ = 0;
 
 		var dt = Time.time - lastTime_;
@@ -108,13 +110,15 @@ public class Marker : MonoBehaviour
 		var dt = Time.time - lastInterpTime_;
 		rawPos_ += velocity_ * dt;
 		currentAngle_ += angleVelocity_ * dt;
+		if (currentAngle_ >  180) currentAngle_ -= 180;
+		if (currentAngle_ < -180) currentAngle_ += 180;
 
 		lastInterpTime_ = Time.time;
 		++interpCount_;
 	}
 
 
-	public void UpdateEdge(List<EdgeData> edges)
+	public void UpdateEdge(int markerId, List<EdgeData> edges)
 	{
 		var updatedMap = new Dictionary<int, bool>();
 		foreach (var data in edges_) {
@@ -130,9 +134,10 @@ public class Marker : MonoBehaviour
 			} else {
 				edgeObj = Instantiate(edgePrefab) as GameObject;
 				edgeObj.transform.SetParent(transform);
-				var shots = edgeObj.GetComponentsInChildren<PlayerNormalShot>();
+				var shots = edgeObj.GetComponentsInChildren<PlayerShot>();
 				foreach (var shot in shots) {
-					shot.shotPower = GetComponent<ShotPower>();
+					shot.charge = charge_;
+					shot.id = markerId;
 				}
 				edges_.Add(id, edgeObj);
 			}

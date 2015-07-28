@@ -28,6 +28,7 @@ public class MarkerManager : MonoBehaviour
 			gameObj.transform.SetParent(GlobalObjects.localStage.transform);
 			var marker = gameObj.GetComponent<Marker>();
 			markers_.Add(data.id, marker);
+			Sound.Play("MarkerDetected");
 		}
 		Update(data);
 	}

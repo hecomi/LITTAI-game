@@ -10,7 +10,7 @@ public class OscServer : MonoBehaviour
     public int listenPort = 6666;
 	public bool isReversed = true;
 	private int sign { get { return isReversed ? -1 : 1; } }
-	private float offsetAngle { get { return isReversed ? Mathf.PI : 0; } }
+	private float offsetAngle { get { return isReversed ? 0 : Mathf.PI; } }
 
     private UdpClient udpClient_;
     private IPEndPoint endPoint_;

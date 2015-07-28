@@ -1,11 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(ShotCharge))]
 public class DummyPlayerController : MonoBehaviour
 {
 	public Vector2 speed;
 	public float rotationSpeed;
 	public bool isPosRestricted = true;
+
+	void Start()
+	{
+		var shots = transform.GetComponentsInChildren<PlayerShot>();
+		var charge = GetComponent<ShotCharge>();
+		foreach (var shot in shots) {
+			shot.charge = charge;
+			shot.id = 0;
+		}
+	}
 
 	void Update()
 	{

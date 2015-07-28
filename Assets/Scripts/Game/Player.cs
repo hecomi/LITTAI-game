@@ -14,13 +14,13 @@ public class Player : MonoBehaviour
 	public GameObject uiPrefab;
 	private GameObject ui_;
 	private PlayerStatusUI status_;
-	private ShotPower shotPower_;
+	private ShotCharge charge_;
 
 	private int frameCount_ = 0;
 
 	void Start()
 	{
-		shotPower_ = GetComponent<ShotPower>();
+		charge_ = GetComponent<ShotCharge>();
 	}
 
 	void OnDestroy()
@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
 
 		if (status_) {
 			status_.hp = 1f * hp / maxHp;
-			status_.en = 1f * shotPower_.power / shotPower_.maxPower;
+			status_.en = 1f * charge_.power / charge_.maxPower;
 			status_.dead = isDead;
 		}
 
@@ -80,6 +80,7 @@ public class Player : MonoBehaviour
 	{
 		isDead = true;
 		deadElapsedTime_ = 0f;
+		Sound.Play("PlayerDeath");
 	}
 
 	void OnRevival()
