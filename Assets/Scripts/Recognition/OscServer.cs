@@ -49,23 +49,18 @@ public class OscServer : MonoBehaviour
 
 	void ProcessMarkerMessage(Osc.Message msg)
 	{
-		try {
-			var json = JSON.Parse(msg.data[0].ToString());
-			var data = convertToMarkerData(json);
+		var json = JSON.Parse(msg.data[0].ToString());
+		var data = convertToMarkerData(json);
 
-			int markerIndex = "/marker".Length;
-			if (msg.path.IndexOf("/create") == markerIndex) {
-				MarkerManager.Create(data);
-			} else if (msg.path.IndexOf("/update") == markerIndex) {
-				MarkerManager.Update(data);
-			} else if (msg.path.IndexOf("/remove") == markerIndex) {
-				MarkerManager.Remove(data);
-			} else {
-				Debug.LogWarning("unknown message: " + msg);
-			}
-		} catch (Exception e) {
-			Debug.LogWarning(e.Message);
-			Debug.LogWarning(msg);
+		int markerIndex = "/marker".Length;
+		if (msg.path.IndexOf("/create") == markerIndex) {
+			MarkerManager.Create(data);
+		} else if (msg.path.IndexOf("/update") == markerIndex) {
+			MarkerManager.Update(data);
+		} else if (msg.path.IndexOf("/remove") == markerIndex) {
+			MarkerManager.Remove(data);
+		} else {
+			Debug.LogWarning("unknown message: " + msg);
 		}
 	}
 
@@ -115,12 +110,14 @@ public class OscServer : MonoBehaviour
 	{
 		MarkerData data = new MarkerData();
 
-		var polygonData = json["polygon"].AsArray;
-		var edgesData   = json["edges"].AsArray;
-		var indicesData = json["indices"].AsArray;
-		List<Vector3> polygon = new List<Vector3>();
-		List<EdgeData> edges = new List<EdgeData>();
-		List<int> indices = new List<int>();
+		var polygonData  = json["polygon"].AsArray;
+		var edgesData    = json["edges"].AsArray;
+		var indicesData  = json["indices"].AsArray;
+		var patternsData = json["patterns"].AsArray;
+		var polygon = new List<Vector3>();
+		var edges = new List<EdgeData>();
+		var indices = new List<int>();
+		var patterns = new List<PatternData>();
 		foreach (JSONClass vert in polygonData) {
 			polygon.Add(new Vector3(sign * vert["x"].AsFloat, 0, sign * vert["y"].AsFloat));
 		}
@@ -135,6 +132,15 @@ public class OscServer : MonoBehaviour
 		foreach (JSONData index in indicesData) {
 			indices.Add(index.AsInt);
 		}
+		foreach (JSONClass pattern in patternsData) {
+			var p = new PatternData();
+			var ids = pattern["ids"].AsArray;
+			p.pattern = pattern["pattern"].AsInt;
+			foreach (JSONData id in ids) {
+				p.ids.Add(id.AsInt);
+			}
+			patterns.Add(p);
+		}
 
 		data.id      = json["id"].AsInt;
 		data.pos     = new Vector3(sign * json["x"].AsFloat, 0f, sign * json["y"].AsFloat);
@@ -144,6 +150,7 @@ public class OscServer : MonoBehaviour
 		data.edges   = edges;
 		data.indices = indices;
 		data.edges   = edges;
+		data.patterns = patterns;
 
 		return data;
 	}

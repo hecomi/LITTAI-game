@@ -6,6 +6,13 @@ using SimpleJSON;
 [RequireComponent(typeof(PolygonCreator)), RequireComponent(typeof(ShotCharge))]
 public class Marker : MonoBehaviour
 {
+	[System.Serializable]
+	public struct PatternPrefab
+	{
+		public int id;
+		public GameObject prefab;
+	}
+
 	private PolygonCreator polygon_;
 	private MarkerData data_;
 	public MarkerData data
@@ -15,7 +22,9 @@ public class Marker : MonoBehaviour
 	private int lostCount_ = 0;
 
 	public GameObject edgePrefab;
+	public List<PatternPrefab> patternPrefabs;
 	private Dictionary<int, GameObject> edges_ = new Dictionary<int, GameObject>();
+	private Dictionary<string, GameObject> patterns_ = new Dictionary<string, GameObject>();
 
 	private Vector3 prePos_ = Vector3.zero;
 	private float currentAngle_ = 0f;
@@ -37,13 +46,13 @@ public class Marker : MonoBehaviour
 	void Awake()
 	{
 		polygon_ = GetComponent<PolygonCreator>();
+		charge_  = GetComponent<ShotCharge>();
 	}
 
 
 	void Start()
 	{
 		rawPos_ = transform.position;
-		charge_ = GetComponent<ShotCharge>();
 	}
 
 
@@ -86,7 +95,8 @@ public class Marker : MonoBehaviour
 		rawPos_ = data.pos;
 		polygon_.polygon = data.polygon;
 		polygon_.indices = data.indices;
-		UpdateEdge(data.id, data.edges);
+		UpdateEdges(data.id, data.edges);
+		UpdatePatterns(data.id, data.patterns);
 		lostCount_ = 0;
 
 		var dt = Time.time - lastTime_;
@@ -118,7 +128,7 @@ public class Marker : MonoBehaviour
 	}
 
 
-	public void UpdateEdge(int markerId, List<EdgeData> edges)
+	public void UpdateEdges(int markerId, List<EdgeData> edges)
 	{
 		var updatedMap = new Dictionary<int, bool>();
 		foreach (var data in edges_) {
@@ -126,20 +136,21 @@ public class Marker : MonoBehaviour
 		}
 
 		foreach (var edge in edges) {
-			GameObject edgeObj;
 			var id = edge.id;
+			GameObject edgeObj;
 			if (edges_.ContainsKey(id)) {
 				edgeObj = edges_[id];
 				updatedMap[id] = true;
 			} else {
 				edgeObj = Instantiate(edgePrefab) as GameObject;
 				edgeObj.transform.SetParent(transform);
-				var shots = edgeObj.GetComponentsInChildren<PlayerShot>();
-				foreach (var shot in shots) {
-					shot.charge = charge_;
-					shot.id = markerId;
-				}
 				edges_.Add(id, edgeObj);
+			}
+			var shots = edgeObj.GetComponentsInChildren<PlayerShot>();
+			foreach (var shot in shots) {
+				shot.charge = charge_;
+				shot.id = markerId;
+				shot.active = true;
 			}
 			edgeObj.transform.localPosition = edge.pos; 
 			var dir = edge.dir.normalized;
@@ -153,6 +164,74 @@ public class Marker : MonoBehaviour
 				Destroy(edges_[id]);
 				edges_.Remove(id);
 			}
+		}
+	}
+
+	void UpdatePatterns(int markerId, List<PatternData> patterns)
+	{
+		var updatedMap = new Dictionary<string, bool>();
+		foreach (var data in patterns_) {
+			updatedMap.Add(data.Key, false);
+		}
+
+		foreach (var pattern in patterns) {
+			GameObject patternObj;
+			var id = "";
+			var averagePos = Vector3.zero;
+			var averageDir = Vector3.zero;
+			foreach (var edgeId in pattern.ids) {
+				id += ("/" + edgeId.ToString());
+				if (!edges_.ContainsKey(edgeId)) {
+					return;
+				}
+				var edge = edges_[edgeId];
+				averagePos += edge.transform.localPosition;
+				averageDir += edge.transform.forward;
+			}
+			averagePos /= edges_.Count;
+			averageDir /= edges_.Count;
+			if (patterns_.ContainsKey(id)) {
+				patternObj = patterns_[id];
+				updatedMap[id] = true;
+			} else {
+				patternObj = InstantiatePattern(pattern.pattern);
+				if (!patternObj) continue;
+				patternObj.transform.SetParent(transform);
+				var shots = patternObj.GetComponentsInChildren<PlayerShot>();
+				foreach (var shot in shots) {
+					shot.charge = charge_;
+					shot.id = markerId;
+				}
+				patterns_.Add(id, patternObj);
+			}
+			patternObj.transform.localPosition = averagePos;
+			patternObj.transform.rotation = Quaternion.LookRotation(averageDir);
+
+			foreach (var edgeId in pattern.ids) {
+				var edge = edges_[edgeId];
+				var shots = edge.GetComponentsInChildren<PlayerShot>();
+				foreach (var shot in shots) {
+					shot.active = false;
+				}
+			}
+		}
+
+		foreach (var data in updatedMap) {
+			var id = data.Key;
+			if (!data.Value) {
+				Destroy(patterns_[id]);
+				patterns_.Remove(id);
+			}
+		}
+	}
+
+	GameObject InstantiatePattern(int patternId)
+	{
+		var prefab = patternPrefabs.Find((PatternPrefab p) => p.id == patternId).prefab;
+		if (prefab) {
+			return Instantiate(prefab) as GameObject;
+		} else {
+			return null;
 		}
 	}
 }

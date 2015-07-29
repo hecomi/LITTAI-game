@@ -4,6 +4,7 @@ using System.Collections;
 public class PlayerShot : MonoBehaviour
 {
 	public int id = 0;
+	public bool active = true;
 
 	private ShotCharge charge_;
 	public ShotCharge charge 
@@ -39,19 +40,34 @@ public class PlayerShot : MonoBehaviour
 		SerialHandler.Pressed  += _OnPressed;
 		SerialHandler.Pressing += _OnPressing;
 		SerialHandler.Released += _OnReleased;
+		OnStart();
+	}
+
+	protected virtual void OnStart()
+	{
 	}
 
 	void OnDestroy()
 	{
-		charge_.Release(gameObject);
+		if (charge_) charge_.Release(gameObject);
 		SerialHandler.Pressed  -= _OnPressed;
 		SerialHandler.Pressing -= _OnPressing;
 		SerialHandler.Released -= _OnReleased;
+		OnEnd();
+	}
+
+	void OnDisable()
+	{
+		if (charge_) charge_.Release(gameObject);
+	}
+
+	protected virtual void OnEnd()
+	{
 	}
 
 	private void _OnPressed(int hwId)
 	{
-		if (IsOwnEvent(hwId)) {
+		if (IsOwnEvent(hwId) && active) {
 			charge_.Get(gameObject);
 			OnPressed();
 		}
@@ -63,7 +79,7 @@ public class PlayerShot : MonoBehaviour
 	
 	private void _OnPressing(int hwId)
 	{
-		if (IsOwnEvent(hwId)) {
+		if (IsOwnEvent(hwId) && active) {
 			charge_.Get(gameObject);
 			OnPressing();
 		}
@@ -75,7 +91,7 @@ public class PlayerShot : MonoBehaviour
 
 	private void _OnReleased(int hwId)
 	{
-		if (IsOwnEvent(hwId)) {
+		if (IsOwnEvent(hwId) && active) {
 			OnReleased();
 			charge_.Release(gameObject);
 		}
