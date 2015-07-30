@@ -192,8 +192,8 @@ public class Marker : MonoBehaviour
 				averageDir += edge.transform.forward;
 			}
 			id += "/" + pattern.pattern.ToString();
-			averagePos /= edges_.Count;
-			averageDir /= edges_.Count;
+			averagePos /= pattern.ids.Count;
+			averageDir /= pattern.ids.Count;
 
 			GameObject patternObj;
 			if (patterns_.ContainsKey(id)) {
