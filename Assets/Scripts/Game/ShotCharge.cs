@@ -9,6 +9,7 @@ public class ShotCharge : MonoBehaviour
 	public int chargeSpeed = 3;
 	private HashSet<GameObject> refs_ = new HashSet<GameObject>();
 
+
 	public bool Use(int point)
 	{
 		if (!CanUse(point)) return false;

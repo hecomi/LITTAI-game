@@ -5,6 +5,7 @@ public class DummyPlayerProxy : MonoBehaviour
 {
 	void OnAttacked(int hit)
 	{
-		transform.parent.SendMessage("OnAttacked", hit, SendMessageOptions.DontRequireReceiver);
+		var player = GetComponentInParent<Player>();
+		player.SendMessage("OnAttacked", hit, SendMessageOptions.DontRequireReceiver);
 	}
 }

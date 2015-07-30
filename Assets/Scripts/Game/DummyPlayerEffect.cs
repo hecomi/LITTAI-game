@@ -26,7 +26,7 @@ public class DummyPlayerEffect : MonoBehaviour
 			effect.transform.position = part.transform.position;
 			effect.transform.SetParent(transform);
 		}
-		StopCoroutine(blinkCroutine_);
+		//StopCoroutine(blinkCroutine_);
 		SetAlpha(1);
 		SetColliderActive(true);
 
@@ -41,7 +41,7 @@ public class DummyPlayerEffect : MonoBehaviour
 			effect.transform.position = part.transform.position;
 			effect.transform.SetParent(transform);
 		}
-		blinkCroutine_ = StartCoroutine(Blink());
+		//blinkCroutine_ = StartCoroutine(Blink());
 		SetColliderActive(false);
 
 		var p = transform.localPosition;

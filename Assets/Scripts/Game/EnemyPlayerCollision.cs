@@ -8,7 +8,8 @@ public class EnemyPlayerCollision : MonoBehaviour
 
 	void OnCollisionEnter(Collision collision)
 	{
-		if (collision.transform.tag == "Player") {
+		var tag = collision.transform.tag;
+		if (tag == "Player") {
 			collision.transform.SendMessage("OnAttacked", attack, SendMessageOptions.DontRequireReceiver);
 			if (isDead) {
 				SendMessage("OnDead", SendMessageOptions.DontRequireReceiver);

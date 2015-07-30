@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerShot : MonoBehaviour
 {
 	public int id = 0;
 	public bool active = true;
+	private bool isPressing_ = false;
 
 	private ShotCharge charge_;
 	public ShotCharge charge 
@@ -70,6 +72,7 @@ public class PlayerShot : MonoBehaviour
 		if (IsOwnEvent(hwId) && active) {
 			charge_.Get(gameObject);
 			OnPressed();
+			isPressing_ = true;
 		}
 	}
 
@@ -80,8 +83,12 @@ public class PlayerShot : MonoBehaviour
 	private void _OnPressing(int hwId)
 	{
 		if (IsOwnEvent(hwId) && active) {
-			charge_.Get(gameObject);
-			OnPressing();
+			if (isPressing_) {
+				charge_.Get(gameObject);
+				OnPressing();
+			} else {
+				_OnPressed(hwId);
+			}
 		}
 	}
 
@@ -98,6 +105,20 @@ public class PlayerShot : MonoBehaviour
 	}
 
 	protected virtual void OnReleased()
+	{
+	}
+
+	public void OnPattern(PatternData pattern, Dictionary<int, GameObject> edgeMap)
+	{
+		List<GameObject> edges = new List<GameObject>();
+		foreach (var id in pattern.ids) {
+			if (!edgeMap.ContainsKey(id)) return;
+			edges.Add(edgeMap[id]);
+		}
+		OnPattern(edges);
+	}
+
+	protected virtual void OnPattern(List<GameObject> edges)
 	{
 	}
 

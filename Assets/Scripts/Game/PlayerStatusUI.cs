@@ -6,6 +6,7 @@ public class PlayerStatusUI : MonoBehaviour
 	public UiGauge hpGauge;
 	public UiGauge enGauge;
 	public GameObject deadPanel;
+	public GameObject emptyLabel;
 
 	public float hp
 	{
@@ -16,12 +17,18 @@ public class PlayerStatusUI : MonoBehaviour
 	public float en 
 	{
 		get { return enGauge.val; }
-		set { enGauge.val = value; }
+		set { enGauge.val = value; empty = (value <= 0.03f); }
 	}
 
 	public bool dead
 	{
 		get { return deadPanel.activeSelf; }
 		set { deadPanel.SetActive(value); }
+	}
+
+	public bool empty
+	{
+		get { return emptyLabel.activeSelf; }
+		set { emptyLabel.SetActive(value); }
 	}
 }

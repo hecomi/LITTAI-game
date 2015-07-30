@@ -43,6 +43,7 @@ public class Marker : MonoBehaviour
 	private bool isInitialized_ = false;
 	private ShotCharge charge_;
 
+
 	void Awake()
 	{
 		polygon_ = GetComponent<PolygonCreator>();
@@ -81,6 +82,8 @@ public class Marker : MonoBehaviour
 			transform.localPosition += (rawPos_ - transform.localPosition) * filter;
 			var from = transform.localRotation;
 			var to   = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
+			if (to.eulerAngles.y - from.eulerAngles.y >  180) from *= Quaternion.Euler(Vector3.up * 360);
+			if (to.eulerAngles.y - from.eulerAngles.y < -180) from *= Quaternion.Euler(-Vector3.up * 360);
 			transform.localRotation = Quaternion.Slerp(from, to, filter);
 		}
 	}
@@ -175,7 +178,6 @@ public class Marker : MonoBehaviour
 		}
 
 		foreach (var pattern in patterns) {
-			GameObject patternObj;
 			var id = "";
 			var averagePos = Vector3.zero;
 			var averageDir = Vector3.zero;
@@ -190,6 +192,8 @@ public class Marker : MonoBehaviour
 			}
 			averagePos /= edges_.Count;
 			averageDir /= edges_.Count;
+
+			GameObject patternObj;
 			if (patterns_.ContainsKey(id)) {
 				patternObj = patterns_[id];
 				updatedMap[id] = true;
@@ -197,20 +201,25 @@ public class Marker : MonoBehaviour
 				patternObj = InstantiatePattern(pattern.pattern);
 				if (!patternObj) continue;
 				patternObj.transform.SetParent(transform);
-				var shots = patternObj.GetComponentsInChildren<PlayerShot>();
-				foreach (var shot in shots) {
-					shot.charge = charge_;
-					shot.id = markerId;
-				}
 				patterns_.Add(id, patternObj);
 			}
+
 			patternObj.transform.localPosition = averagePos;
-			patternObj.transform.rotation = Quaternion.LookRotation(averageDir);
+			if (averageDir != Vector3.zero) {
+				patternObj.transform.rotation = Quaternion.LookRotation(averageDir);
+			}
+
+			var patternShots = patternObj.GetComponentsInChildren<PlayerShot>();
+			foreach (var shot in patternShots) {
+				shot.charge = charge_;
+				shot.id = markerId;
+				shot.OnPattern(pattern, edges_);
+			}
 
 			foreach (var edgeId in pattern.ids) {
 				var edge = edges_[edgeId];
-				var shots = edge.GetComponentsInChildren<PlayerShot>();
-				foreach (var shot in shots) {
+				var normalShots = edge.GetComponentsInChildren<PlayerShot>();
+				foreach (var shot in normalShots) {
 					shot.active = false;
 				}
 			}

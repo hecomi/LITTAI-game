@@ -45,6 +45,8 @@ public class SerialHandler : MonoBehaviour
 		get { return SerialHandler.instance; }
 	}
 
+	private Dictionary<int, int> lostCount_;
+
 	void Awake()
 	{
 		if(instance == null) {
