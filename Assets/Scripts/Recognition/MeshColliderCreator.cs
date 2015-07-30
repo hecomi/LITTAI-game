@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshCollider))]
+[RequireComponent(typeof(MeshFilter))]
 public class MeshColliderCreator : MonoBehaviour
 {
 	private MeshFilter   meshFilter_;
@@ -15,6 +15,10 @@ public class MeshColliderCreator : MonoBehaviour
 
 	void Update()
 	{
-		meshCollider_.sharedMesh = meshFilter_.sharedMesh;
+		if (meshCollider_) {
+			meshCollider_.sharedMesh = meshFilter_.sharedMesh;
+		} else {
+			meshCollider_ = GetComponent<MeshCollider>();
+		}
 	}
 }

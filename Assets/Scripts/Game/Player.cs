@@ -84,7 +84,8 @@ public class Player : MonoBehaviour
 		deadElapsedTime_ = 0f;
 		Sound.Play("PlayerDeath");
 		if (collider_) {
-			collider_.enabled = false;
+			// collider_.enabled = false;
+			Destroy(collider_);
 		}
 	}
 
@@ -92,8 +93,8 @@ public class Player : MonoBehaviour
 	{
 		isDead = false;
 		hp = maxHp;
-		if (collider_) {
-			collider_.enabled = true;
+		if (!collider_) {
+			gameObject.AddComponent<MeshCollider>();
 		}
 	}
 }
