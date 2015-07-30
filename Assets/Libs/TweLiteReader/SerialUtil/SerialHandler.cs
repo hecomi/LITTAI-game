@@ -142,7 +142,7 @@ public class SerialHandler : MonoBehaviour
 			thread_.Start();
 			
 			Debug.Log("Connected!");
-		} catch (System.Exception e) {
+		} catch (System.Exception) {
 			// Debug.LogError(e.Message);
 		}
 	}

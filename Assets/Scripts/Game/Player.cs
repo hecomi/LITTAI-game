@@ -17,10 +17,12 @@ public class Player : MonoBehaviour
 	private ShotCharge charge_;
 
 	private int frameCount_ = 0;
+	private Collider collider_;
 
 	void Start()
 	{
 		charge_ = GetComponent<ShotCharge>();
+		collider_ = GetComponent<Collider>();
 	}
 
 	void OnDestroy()
@@ -81,11 +83,17 @@ public class Player : MonoBehaviour
 		isDead = true;
 		deadElapsedTime_ = 0f;
 		Sound.Play("PlayerDeath");
+		if (collider_) {
+			collider_.enabled = false;
+		}
 	}
 
 	void OnRevival()
 	{
 		isDead = false;
 		hp = maxHp;
+		if (collider_) {
+			collider_.enabled = true;
+		}
 	}
 }
