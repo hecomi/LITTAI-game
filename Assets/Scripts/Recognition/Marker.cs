@@ -25,6 +25,7 @@ public class Marker : MonoBehaviour
 	public List<PatternPrefab> patternPrefabs;
 	private Dictionary<int, GameObject> edges_ = new Dictionary<int, GameObject>();
 	private Dictionary<string, GameObject> patterns_ = new Dictionary<string, GameObject>();
+	private Dictionary<string, int> patternsLostCount_ = new Dictionary<string, int>();
 
 	private Vector3 prePos_ = Vector3.zero;
 	private float currentAngle_ = 0f;
@@ -182,7 +183,7 @@ public class Marker : MonoBehaviour
 			var averagePos = Vector3.zero;
 			var averageDir = Vector3.zero;
 			foreach (var edgeId in pattern.ids) {
-				id += ("/" + edgeId.ToString());
+				id += "/" + edgeId.ToString();
 				if (!edges_.ContainsKey(edgeId)) {
 					return;
 				}
@@ -190,6 +191,7 @@ public class Marker : MonoBehaviour
 				averagePos += edge.transform.localPosition;
 				averageDir += edge.transform.forward;
 			}
+			id += "/" + pattern.pattern.ToString();
 			averagePos /= edges_.Count;
 			averageDir /= edges_.Count;
 
@@ -228,8 +230,15 @@ public class Marker : MonoBehaviour
 		foreach (var data in updatedMap) {
 			var id = data.Key;
 			if (!data.Value) {
-				Destroy(patterns_[id]);
-				patterns_.Remove(id);
+				if (patternsLostCount_.ContainsKey(data.Key)) {
+					if (patternsLostCount_[data.Key]++ > 10) {
+						Destroy(patterns_[id]);
+						patterns_.Remove(id);
+						patternsLostCount_.Remove(id);
+					}
+				} else {
+					patternsLostCount_.Add(data.Key, 1);
+				}
 			}
 		}
 	}
