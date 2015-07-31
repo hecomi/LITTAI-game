@@ -38,5 +38,10 @@ public class ShotCharge : MonoBehaviour
 			power += chargeSpeed;
 			if (power > maxPower) power = maxPower;
 		}
+		if (refs_.Count > 0) {
+			foreach (var r in refs_) {
+				Debug.Log (r.name);
+			}
+		}
 	}
 }

@@ -18,7 +18,8 @@ public class EnemyNWayShot : MonoBehaviour
 	void Shot()
 	{
 		for (int i = 0; i < nWay; ++i) {
-			var a = (centerAngle + (spreadAngle / nWay) * (i - nWay / 2f + 0.5f)) * Mathf.Deg2Rad;
+			var offset = transform.eulerAngles.y;
+			var a = (centerAngle + (spreadAngle / nWay) * (i - nWay / 2f + 0.5f) + offset) * Mathf.Deg2Rad;
 			var dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
 			ShotTo(dir);
 		}

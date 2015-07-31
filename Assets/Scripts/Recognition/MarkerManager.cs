@@ -116,6 +116,7 @@ public class MarkerManager : MonoBehaviour
 			Destroy(markers_[data.id].gameObject);
 			markers_.Remove(data.id);
 		}
+		Sound.Play("MarkerLost");
 	}
 
 

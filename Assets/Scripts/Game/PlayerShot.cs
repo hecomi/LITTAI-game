@@ -5,7 +5,12 @@ using System.Collections.Generic;
 public class PlayerShot : MonoBehaviour
 {
 	public int id = 0;
-	public bool active = true;
+	private bool active_ = true;
+	public bool active 
+	{
+		get { return active_; }
+		set { active_ = value; if (!value) charge_.Release(gameObject); }
+	}
 	private bool isPressing_ = false;
 
 	private ShotCharge charge_;
@@ -56,11 +61,6 @@ public class PlayerShot : MonoBehaviour
 		SerialHandler.Pressing -= _OnPressing;
 		SerialHandler.Released -= _OnReleased;
 		OnEnd();
-	}
-
-	void OnDisable()
-	{
-		if (charge_) charge_.Release(gameObject);
 	}
 
 	protected virtual void OnEnd()

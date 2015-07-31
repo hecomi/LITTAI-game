@@ -17,4 +17,11 @@ public static class Parameters
 		IdMap.TryGetValue(hwId, out markerId);
 		return markerId;
 	}
+
+
+	public enum Items
+	{
+		RevivalSphere,
+		Coin
+	}
 }

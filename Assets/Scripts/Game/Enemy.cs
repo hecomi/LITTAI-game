@@ -19,7 +19,7 @@ public class Enemy : MonoBehaviour
 		var ui = Instantiate(enemyStatusUi) as GameObject;
 		ui.transform.position = transform.position + uiOffset;
 		ui.transform.SetParent(transform);
-		maxHp_ = 100;
+		maxHp_ = hp;
 		hpGauge_ = ui.GetComponentInChildren<UiGauge>();
 	}
 

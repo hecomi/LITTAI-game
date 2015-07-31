@@ -83,8 +83,8 @@ public class Marker : MonoBehaviour
 			transform.localPosition += (rawPos_ - transform.localPosition) * filter;
 			var from = transform.localRotation;
 			var to   = Quaternion.AngleAxis(currentAngle_ * Mathf.Rad2Deg, Vector3.down);
-			if (to.eulerAngles.y - from.eulerAngles.y >  180) from *= Quaternion.Euler(Vector3.up * 360);
-			if (to.eulerAngles.y - from.eulerAngles.y < -180) from *= Quaternion.Euler(-Vector3.up * 360);
+			if (to.eulerAngles.y - from.eulerAngles.y >=  180) from *= Quaternion.Euler(Vector3.up * 360);
+			if (to.eulerAngles.y - from.eulerAngles.y <= -180) from *= Quaternion.Euler(-Vector3.up * 360);
 			transform.localRotation = Quaternion.Slerp(from, to, filter);
 		}
 	}
@@ -230,14 +230,18 @@ public class Marker : MonoBehaviour
 		foreach (var data in updatedMap) {
 			var id = data.Key;
 			if (!data.Value) {
-				if (patternsLostCount_.ContainsKey(data.Key)) {
-					if (patternsLostCount_[data.Key]++ > 10) {
+				if (patternsLostCount_.ContainsKey(id)) {
+					if (patternsLostCount_[id]++ > 10) {
 						Destroy(patterns_[id]);
 						patterns_.Remove(id);
 						patternsLostCount_.Remove(id);
 					}
 				} else {
-					patternsLostCount_.Add(data.Key, 1);
+					patternsLostCount_.Add(id, 1);
+				}
+			} else {
+				if (patternsLostCount_.ContainsKey(id)) {
+					patternsLostCount_[id] = 0;
 				}
 			}
 		}

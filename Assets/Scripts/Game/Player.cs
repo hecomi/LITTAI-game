@@ -10,7 +10,6 @@ public class Player : MonoBehaviour
 	public float deadWaitTime = 3f;
 	private float deadElapsedTime_ = 0f;
 
-	public GameObject hitEffectPrefab;
 	public GameObject uiPrefab;
 	private GameObject ui_;
 	private PlayerStatusUI status_;
@@ -37,7 +36,6 @@ public class Player : MonoBehaviour
 		if (isDead) {
 			deadElapsedTime_ += Time.deltaTime;
 			if (deadElapsedTime_ >= deadWaitTime) {
-				BroadcastMessage("OnRevival");
 			}
 		}
 
@@ -70,12 +68,6 @@ public class Player : MonoBehaviour
 		if (isDead) return;
 		hp -= damage;
 		if (hp <= 0) BroadcastMessage("OnDead", SendMessageOptions.DontRequireReceiver);
-
-		if (hitEffectPrefab) {
-			var effect = Instantiate(hitEffectPrefab) as GameObject;
-			effect.transform.position = transform.position;
-			effect.transform.parent = transform;
-		}
 	}
 
 	void OnDead()
@@ -87,6 +79,8 @@ public class Player : MonoBehaviour
 			// collider_.enabled = false;
 			Destroy(collider_);
 		}
+
+		StartCoroutine(Dead());
 	}
 
 	void OnRevival()
@@ -95,6 +89,29 @@ public class Player : MonoBehaviour
 		hp = maxHp;
 		if (!collider_) {
 			gameObject.AddComponent<MeshCollider>();
+		}
+		Sound.Play("PlayerRevival");
+	}
+
+	IEnumerator Dead()
+	{
+		if (deadWaitTime < 1f) deadWaitTime += 1f;
+		yield return new WaitForSeconds(deadWaitTime - 1f);
+
+		var landolt = LandoltManager.GetFirst();
+		if (landolt) {
+			landolt.EmitRevivalSphere(gameObject);
+		}
+
+		yield return new WaitForSeconds(1f);
+		BroadcastMessage("OnRevival");
+	}
+
+	void OnItem(Parameters.Items item)
+	{
+		switch (item) {
+			case Parameters.Items.RevivalSphere:
+				break;
 		}
 	}
 }

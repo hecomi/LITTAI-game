@@ -16,6 +16,7 @@ public class ScoreReceiver : MonoBehaviour
 	{
 		Score.Add(score);
 		GenerateEffect();
+		Sound.Play("GetScore");
 	}
 
 	void GenerateEffect()

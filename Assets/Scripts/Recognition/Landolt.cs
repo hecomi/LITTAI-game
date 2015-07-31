@@ -24,6 +24,9 @@ public class Landolt : MonoBehaviour
 	private bool isInitialized_ = false;
 	private bool touched_ = false;
 
+	public GameObject revivalSpherePrefab;
+	public GameObject scoreDecreseEffectPrefab;
+
 
 	void Update()
 	{
@@ -103,5 +106,30 @@ public class Landolt : MonoBehaviour
 	public void _SetRawPos(Vector3 pos)
 	{
 		rawPos_ = pos;
+	}
+
+	public void EmitRevivalSphere(GameObject target)
+	{
+		if (!revivalSpherePrefab) return;
+		for (var i = 0; i < 5; ++i) {
+			var obj = Instantiate(revivalSpherePrefab);
+			obj.transform.SetParent(GlobalObjects.localStage.transform);
+			obj.transform.localPosition = transform.localPosition;
+			var sphere = obj.GetComponent<PlayerRevivalSphere>();
+			if (sphere) {
+				sphere.target = target;
+			}
+			Score.Sub(2000 / 5);
+			StartCoroutine(GenerateScoreDecreaseEffect(i * 0.1f));
+		}
+	}
+
+	IEnumerator GenerateScoreDecreaseEffect(float offset)
+	{
+		yield return new WaitForSeconds(offset);
+		Sound.Play("EmitRevivalSphere");
+		var effect = Instantiate(scoreDecreseEffectPrefab);
+		effect.transform.SetParent(transform);
+		effect.transform.position = transform.position;
 	}
 }
