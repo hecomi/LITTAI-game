@@ -5,7 +5,7 @@ public class Stage : MonoBehaviour
 {
 	static public Vector2 MinPos  = new Vector2(-1f, -1f);
 	static public Vector2 MaxPos  = new Vector2(1f, 1f);
-	static public float PosMarginX = 0.5f;
+	static public float PosMarginX = 1.0f;
 	static public float PosMarginY = 0.2f;
 
 	static public bool IsInArea(Vector2 p)

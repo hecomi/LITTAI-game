@@ -7,6 +7,7 @@ public class Score : MonoBehaviour
 	private int rawScore_ = 0;
 	private int score_ = 0;
 	public int dScore = 10;
+	private int frameCount_ = 0;
 
 	void Awake()
 	{
@@ -15,7 +16,13 @@ public class Score : MonoBehaviour
 
 	void Update()
 	{
-		score_ = Mathf.Min(score_ + dScore, rawScore_);
+		var newScore = Mathf.Min(score_ + dScore, rawScore_);
+		if (newScore != score_) {
+			score_ = newScore;
+			if (frameCount_ % 5 == 0) { 
+				Sound.Play("ScoreCountUp");
+			}
+		}
 	}
 
 	static public int Get()
