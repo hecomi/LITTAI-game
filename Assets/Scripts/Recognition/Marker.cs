@@ -26,6 +26,7 @@ public class Marker : MonoBehaviour
 	private Dictionary<int, GameObject> edges_ = new Dictionary<int, GameObject>();
 	private Dictionary<string, GameObject> patterns_ = new Dictionary<string, GameObject>();
 	private Dictionary<string, int> patternsLostCount_ = new Dictionary<string, int>();
+	private Dictionary<string, int> patternsDetectCount_ = new Dictionary<string, int>();
 
 	private Vector3 prePos_ = Vector3.zero;
 	private float currentAngle_ = 0f;
@@ -192,37 +193,42 @@ public class Marker : MonoBehaviour
 				averageDir += edge.transform.forward;
 			}
 			id += "/" + pattern.pattern.ToString();
-			averagePos /= pattern.ids.Count;
-			averageDir /= pattern.ids.Count;
 
-			GameObject patternObj;
-			if (patterns_.ContainsKey(id)) {
-				patternObj = patterns_[id];
-				updatedMap[id] = true;
-			} else {
-				patternObj = InstantiatePattern(pattern.pattern);
-				if (!patternObj) continue;
-				patternObj.transform.SetParent(transform);
-				patterns_.Add(id, patternObj);
-			}
+			if (!patternsDetectCount_.ContainsKey(id)) {
+				patternsDetectCount_.Add (id, 1);
+			} else if (++patternsDetectCount_[id] < 30) {
+				averagePos /= pattern.ids.Count;
+				averageDir /= pattern.ids.Count;
 
-			patternObj.transform.localPosition = averagePos;
-			if (averageDir != Vector3.zero) {
-				patternObj.transform.rotation = Quaternion.LookRotation(averageDir);
-			}
+				GameObject patternObj;
+				if (patterns_.ContainsKey(id)) {
+					patternObj = patterns_[id];
+					updatedMap[id] = true;
+				} else {
+					patternObj = InstantiatePattern(pattern.pattern);
+					if (!patternObj) continue;
+					patternObj.transform.SetParent(transform);
+					patterns_.Add(id, patternObj);
+				}
 
-			var patternShots = patternObj.GetComponentsInChildren<PlayerShot>();
-			foreach (var shot in patternShots) {
-				shot.charge = charge_;
-				shot.id = markerId;
-				shot.OnPattern(pattern, edges_);
-			}
+				patternObj.transform.localPosition = averagePos;
+				if (averageDir != Vector3.zero) {
+					patternObj.transform.rotation = Quaternion.LookRotation(averageDir);
+				}
 
-			foreach (var edgeId in pattern.ids) {
-				var edge = edges_[edgeId];
-				var normalShots = edge.GetComponentsInChildren<PlayerShot>();
-				foreach (var shot in normalShots) {
-					shot.active = false;
+				var patternShots = patternObj.GetComponentsInChildren<PlayerShot>();
+				foreach (var shot in patternShots) {
+					shot.charge = charge_;
+					shot.id = markerId;
+					shot.OnPattern(pattern, edges_);
+				}
+
+				foreach (var edgeId in pattern.ids) {
+					var edge = edges_[edgeId];
+					var normalShots = edge.GetComponentsInChildren<PlayerShot>();
+					foreach (var shot in normalShots) {
+						shot.active = false;
+					}
 				}
 			}
 		}
@@ -233,8 +239,13 @@ public class Marker : MonoBehaviour
 				if (patternsLostCount_.ContainsKey(id)) {
 					if (patternsLostCount_[id]++ > 10) {
 						Destroy(patterns_[id]);
-						patterns_.Remove(id);
 						patternsLostCount_.Remove(id);
+						if (patterns_.ContainsKey(id)) {
+							patterns_.Remove(id);
+						}
+						if (patternsDetectCount_.ContainsKey(id)) {
+							patternsDetectCount_.Remove(id);
+						}
 					}
 				} else {
 					patternsLostCount_.Add(id, 1);

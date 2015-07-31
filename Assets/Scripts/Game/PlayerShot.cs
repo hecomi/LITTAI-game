@@ -48,6 +48,11 @@ public class PlayerShot : MonoBehaviour
 		SerialHandler.Pressing += _OnPressing;
 		SerialHandler.Released += _OnReleased;
 		OnStart();
+
+		var player = GetComponentInParent<Player>();
+		if (player.isDead) {
+			OnDead();
+		}
 	}
 
 	protected virtual void OnStart()

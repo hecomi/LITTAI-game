@@ -6,23 +6,23 @@ public class PlayerLazer : MonoBehaviour
 	public int attack = 0;
 	public GameObject hitEffect;
 
-	void OnCollisionEnter(Collision collision)
+	void OnTriggerEnter(Collider collider)
 	{
-		Attack(collision);
+		Attack(collider);
 	}
 
-	void OnCollisionStay(Collision collision)
+	void OnTriggerStay(Collider collider)
 	{
-		Attack(collision);
+		Attack(collider);
 	}
 
-	void Attack(Collision collision)
+	void Attack(Collider collider)
 	{
 		if (hitEffect) {
 			var effect = Instantiate(hitEffect) as GameObject;
-			effect.transform.position = collision.transform.position;
+			effect.transform.position = collider.transform.position;
 			effect.transform.parent = transform.parent;
 		}
-		collision.transform.SendMessage("OnAttacked", attack, SendMessageOptions.DontRequireReceiver);
+		collider.transform.SendMessage("OnAttacked", attack, SendMessageOptions.DontRequireReceiver);
 	}
 }
