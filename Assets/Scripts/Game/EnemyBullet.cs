@@ -8,6 +8,7 @@ public class EnemyBullet : MonoBehaviour
 	private int frameCount = 0;
 
 	public GameObject hitEffect;
+	public GameObject scoreSphere;
 
 
 	void Update()
@@ -29,11 +30,17 @@ public class EnemyBullet : MonoBehaviour
 	void OnCollisionEnter(Collision collision)
 	{
 		if (hitEffect) {
-			var effect = Instantiate(hitEffect) as GameObject;
+			var effect = Instantiate(hitEffect);
 			effect.transform.position = transform.position;
-			effect.transform.parent = transform.parent;
+			effect.transform.SetParent(transform.parent);
 		}
 		collision.transform.SendMessage("OnAttacked", attack, SendMessageOptions.DontRequireReceiver);
 		Destroy(gameObject);
+
+		if (collision.transform.tag == "Player Bullet" && scoreSphere) {
+			var obj = Instantiate(scoreSphere);
+			obj.transform.position = transform.position;
+			obj.transform.SetParent(GlobalObjects.localStage.transform);
+		}
 	}
 }

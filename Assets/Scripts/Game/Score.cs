@@ -35,6 +35,11 @@ public class Score : MonoBehaviour
 		Instance.rawScore_ += value;
 	}
 
+	static public void Set(int value)
+	{
+		Instance.rawScore_ = value;
+	}
+
 	static public void Sub(int value)
 	{
 		Instance.rawScore_ -= value;

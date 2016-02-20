@@ -6,6 +6,7 @@ public class Landolt : MonoBehaviour
 	private LandoltData data_;
 	public float scaleRatio = 1.8f;
 	private int lostCount_ = 0;
+	private float localScaleY_ = 1f;
 
 	private Vector3 prePos_ = Vector3.zero;
 	private float currentAngle_ = 0f;
@@ -26,6 +27,12 @@ public class Landolt : MonoBehaviour
 
 	public GameObject revivalSpherePrefab;
 	public GameObject scoreDecreseEffectPrefab;
+
+
+	void Awake()
+	{
+		localScaleY_ = transform.localScale.y;
+	}
 
 
 	void Update()
@@ -54,7 +61,7 @@ public class Landolt : MonoBehaviour
 
 		data_ = data;
 		rawPos_ = new Vector3(data.pos.x, 0f, data.pos.y);
-		transform.localScale = new Vector3(data_.width, 1f, data_.height) * scaleRatio;
+		transform.localScale = new Vector3(data_.width * scaleRatio, localScaleY_, data_.height * scaleRatio);
 		lostCount_ = 0;
 
 		var dt = Time.time - lastTime_;

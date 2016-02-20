@@ -16,21 +16,25 @@ public class BombNormal : MonoBehaviour
 
 	void Update()
 	{
+		if (!GameSequence.IsGameStarted()) return;
+
 		if (isTouching_) ++touchCount_;
-		if (touchCount_ > touchDuration) {
+		if (touchCount_ == touchDuration) {
 			StartCoroutine(Bomb());
-			touchCount_ = 0;
 		}
 	}
 
 	void OnTouchStart()
 	{
+		if (!GameSequence.IsGameStarted()) return;
 		isTouching_ = true;
 	}
 
 	void OnTouchEnd()
 	{
+		if (!GameSequence.IsGameStarted()) return;
 		isTouching_ = false;
+		touchCount_ = 0;
 	}
 
 	IEnumerator Bomb()

@@ -17,7 +17,7 @@ public class Sound : MonoBehaviour
 
 	void Awake()
 	{
-		Instance = this; 
+		Instance = this;
 	}
 
 	void Start()
@@ -32,14 +32,18 @@ public class Sound : MonoBehaviour
 		}
 	}
 
-	void PlayImpl(string name)
+	void PlayImpl(string name, Vector3 pos)
 	{
 		if (dict_.ContainsKey(name)) {
 			var sound = dict_[name];
-			AudioSource.PlayClipAtPoint(
-				sound.clip, 
-				GlobalObjects.localStage.transform.position, 
-				sound.volume);
+			var obj = new GameObject(name);
+			obj.transform.position = pos;
+			obj.transform.SetParent(transform);
+			var source = obj.AddComponent<AudioSource>();
+			source.spatialBlend = 1f;
+			source.rolloffMode = AudioRolloffMode.Logarithmic;
+			source.PlayOneShot(sound.clip, sound.volume);
+			Destroy(obj, sound.clip.length + 1f);
 		} else {
 			Debug.LogWarning(name + " does not exist in sound list");
 		}
@@ -47,6 +51,15 @@ public class Sound : MonoBehaviour
 
 	public static void Play(string name)
 	{
-		Instance.PlayImpl(name);
+		if (SystemInfo.graphicsDeviceID == 0) return;
+
+		Instance.PlayImpl(name, Camera.main.transform.position);
+	}
+
+	public static void Play(string name, Vector3 pos)
+	{
+		if (SystemInfo.graphicsDeviceID == 0) return;
+
+		Instance.PlayImpl(name, pos);
 	}
 }

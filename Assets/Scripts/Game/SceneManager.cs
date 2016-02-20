@@ -8,7 +8,7 @@ public class SceneManager : MonoBehaviour
 	void Update()
 	{
 		if (Input.GetKeyDown(restartKey)) {
-			Application.LoadLevel(0);
+			GameSequence.Restart();
 		}
 	}
 }
